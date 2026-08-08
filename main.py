@@ -13,17 +13,15 @@ def cargar_json(ruta_archivo):
         datos_json = json.load(archivo)
         archivo.close()
         
-        # Recorremos el diccionario 
-        for municipio, lista_de_localidades in datos_json.items():
-            # Recorremos cada localidad dentro de ese municipio
-            for item in lista_de_localidades:
-                nueva_zona = Localidad(
-                    municipio,          
-                    item["localidad"],  
-                    item["latitud"],
-                    item["longitud"]
-                )
-                lista_zonas.append(nueva_zona)
+        # Transformar los diccionarios del JSON en objetos de la clase Localidad
+        for item in datos_json:
+            nueva_zona = Localidad(
+                item["municipio"],
+                item["localidad"],
+                item["latitud"],
+                item["longitud"]
+            )
+            lista_zonas.append(nueva_zona)
             
         return lista_zonas
         
