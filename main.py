@@ -1,8 +1,11 @@
 import json # Usado solo para la lectura inicial del archivo con las zonas
 from localidad import Localidad
 
-# Lee el archivo JSON local y convierte cada registro en un objeto Localidad.
 def cargar_json(ruta_archivo):
+    """
+    Abre el archivo local de zonas, recorre el diccionario principal y transforma cada registro 
+    valido en un objeto de la clase Localidad. Retorna la lista completa de objetos.
+    """
     lista_zonas = []
     
     try:
