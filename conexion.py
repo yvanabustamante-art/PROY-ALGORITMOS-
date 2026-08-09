@@ -3,9 +3,6 @@ from clima import Clima
 from dia import DiaHistorico
 
 class Conexion:
-    """
-    Clase encargada de manejar todas las comunicaciones por internet (HTTP) con la API de Open-Meteo.
-    """
 
     def __init__(self):
         """
@@ -67,14 +64,18 @@ class Conexion:
                     fechas = datos["daily"]["time"]
                     temperaturas = datos["daily"]["temperature_2m_mean"]
                     lluvias = datos["daily"]["precipitation_sum"]
+                    humedades = datos["daily"]["relative_humidity_2m_mean"]
+                    vientos = datos["daily"]["wind_speed_10m_max"]
                     
                     # Bucle para crear los objetos sin usar diccionarios de almacenamiento
                     indice = 0
                     while indice < len(fechas):
-                        nuevo_dia = DiaHistorico(
+                        nuevo_dia = DiaHistorico (
                             fechas[indice], 
                             temperaturas[indice], 
-                            lluvias[indice]
+                            lluvias[indice],
+                            humedades[indice],
+                            vientos[indice]
                         )
                         lista_dias.append(nuevo_dia)
                         indice = indice + 1
