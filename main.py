@@ -10,16 +10,16 @@ def cargar_json(ruta_archivo):
         datos_json = json.load(archivo)
         archivo.close()
         
-        
-        for item in datos_json:
-            nueva_zona = Localidad(
-                item["municipio"],
-                item["localidad"],
-                item["latitud"],
-                item["longitud"]
-            )
-            lista_zonas.append(nueva_zona)
-            
+        for municipio, lista_de_localidades in datos_json.items():
+            for item in lista_de_localidades:
+                nueva_zona = Localidad(
+                    municipio,
+                    item["localidad"],
+                    item["latitud"],
+                    item["longitud"]
+                )
+                lista_zonas.append(nueva_zona)
+
         return lista_zonas
         
     except FileNotFoundError:
@@ -28,20 +28,49 @@ def cargar_json(ruta_archivo):
     except Exception as error_carga:
         print("Error inesperado al cargar datos: " + str(error_carga))
         return []
+
 def reporte_inicial(lista_zonas):
+
     print("\nREPORTE INICIAL DE ZONAS DE CARACAS\n")
     
     if len(lista_zonas) == 0:
         print("La lista de zonas esta vacia.")
-    else:
+        return
+
+    municipios = []
+    for zona in lista_zonas:
+        if zona.municipio not in municipios:
+            municipios.append(zona.municipio)
+
+    for mun in municipios:
+        total_loc = 0
+        con_coord = 0
+        sin_coord = 0
+        
         for zona in lista_zonas:
-            zona.mostrar_datos()           
+            if zona.municipio == mun:
+                total_loc = total_loc + 1              
+                if zona.latitud != None and zona.longitud != None:
+                    con_coord = con_coord + 1
+                else:
+                    sin_coord = sin_coord + 1
+
+        porcentaje = 0
+        if total_loc > 0:
+            porcentaje = (con_coord / total_loc) * 100
+
+        print("\nMunicipio: " + mun.upper())
+        print("-> Localidades cargadas: " + str(total_loc))
+        print("-> Con coordenadas: " + str(con_coord))
+        print("-> Sin coordenadas: " + str(sin_coord))
+        print("-> Porcentaje de validez: " + str(round(porcentaje, 2)) + " %")
     print("\n")
 
 if __name__ == "__main__":
-    lista_memoria = cargar_json("zonas.json")
-    reporte_inicial(lista_memoria) 
-
+     
+    lista_memoria = cargar_json("zonas_caracas.json")
+    reporte_inicial(lista_memoria)
+     
     if len(lista_memoria) > 0:
         from conexion import Conexion
         from buscador import Buscador
@@ -50,8 +79,6 @@ if __name__ == "__main__":
         api = Conexion()
         motor = Buscador()
         datos_sesion = Estadisticas()
-        
-        datos_sesion.revisar_coordenadas(lista_memoria)
         
         salir = False
         while salir == False: 
