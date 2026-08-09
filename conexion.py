@@ -3,6 +3,9 @@ from clima import Clima
 from dia import DiaHistorico
 
 class Conexion:
+    """
+    Clase encargada de manejar todas las comunicaciones por internet (HTTP) con la API de Open-Meteo.
+    """
 
     def __init__(self):
         """
@@ -39,53 +42,58 @@ class Conexion:
         except requests.exceptions.RequestException as error_red:
             print("Error de conexion: " + str(error_red))
             return None
-        
+
     def consultar_historico(self, latitud, longitud, fecha_inicio, fecha_fin):
-            parametros = {
-                "latitude": latitud,
-                "longitude": longitud,
-                "start_date": fecha_inicio,
-                "end_date": fecha_fin,
-                "daily": "temperature_2m_mean,precipitation_sum",
-                "timezone": "auto"
-            }
+        """
+        Se conecta a la API de archivos pasados usando coordenadas y un rango de fechas. Extrae 
+        las 4 variables diarias y retorna una lista llena de objetos DiaHistorico.
+        """
+
+        parametros = {
+            "latitude": latitud,
+            "longitude": longitud,
+            "start_date": fecha_inicio,
+            "end_date": fecha_fin,
+            "daily": "temperature_2m_mean,precipitation_sum,relative_humidity_2m_mean,wind_speed_10m_max",
+            "timezone": "auto"
+        }
+        
+        try:
+            respuesta = requests.get(self.url_historia, params=parametros, timeout=10)
             
-            try:
-                respuesta = requests.get(self.url_historia, params=parametros, timeout=10)
-                
-                if respuesta.status_code == 200:
-                    datos = respuesta.json()
-                    lista_dias = []
-    
-                    if "daily" not in datos:
-                        print("Error: No se encontraron datos para estas fechas.")
-                        return lista_dias
-                        
-                    fechas = datos["daily"]["time"]
-                    temperaturas = datos["daily"]["temperature_2m_mean"]
-                    lluvias = datos["daily"]["precipitation_sum"]
-                    humedades = datos["daily"]["relative_humidity_2m_mean"]
-                    vientos = datos["daily"]["wind_speed_10m_max"]
-                    
-                    # Bucle para crear los objetos sin usar diccionarios de almacenamiento
-                    indice = 0
-                    while indice < len(fechas):
-                        nuevo_dia = DiaHistorico (
-                            fechas[indice], 
-                            temperaturas[indice], 
-                            lluvias[indice],
-                            humedades[indice],
-                            vientos[indice]
-                        )
-                        lista_dias.append(nuevo_dia)
-                        indice = indice + 1
-                        
+            if respuesta.status_code == 200:
+                datos = respuesta.json()
+                lista_dias = []
+
+                if "daily" not in datos:
+                    print("Error: No se encontraron datos para estas fechas.")
                     return lista_dias
                     
-                else:
-                    print("Error: La API devolvio codigo " + str(respuesta.status_code))
-                    return []
+                fechas = datos["daily"]["time"]
+                temperaturas = datos["daily"]["temperature_2m_mean"]
+                lluvias = datos["daily"]["precipitation_sum"]
+                humedades = datos["daily"]["relative_humidity_2m_mean"]
+                vientos = datos["daily"]["wind_speed_10m_max"]
+                
+                # Bucle para crear los objetos sin usar diccionarios de almacenamiento
+                indice = 0
+                while indice < len(fechas):
+                    nuevo_dia = DiaHistorico(
+                        fechas[indice], 
+                        temperaturas[indice], 
+                        lluvias[indice],
+                        humedades[indice],
+                        vientos[indice]
+                    )
+                    lista_dias.append(nuevo_dia)
+                    indice = indice + 1
                     
-            except requests.exceptions.RequestException as error_red:
-                print("Error de conexion: " + str(error_red))
+                return lista_dias
+                
+            else:
+                print("Error: La API devolvio codigo " + str(respuesta.status_code))
                 return []
+                
+        except requests.exceptions.RequestException as error_red:
+            print("Error de conexion: " + str(error_red))
+            return []
