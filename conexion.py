@@ -75,7 +75,6 @@ class Conexion:
                 humedades = datos["daily"]["relative_humidity_2m_mean"]
                 vientos = datos["daily"]["wind_speed_10m_max"]
                 
-                # Bucle para crear los objetos sin usar diccionarios de almacenamiento
                 indice = 0
                 while indice < len(fechas):
                     nuevo_dia = DiaHistorico(
