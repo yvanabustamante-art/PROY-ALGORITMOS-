@@ -68,3 +68,26 @@ class Estadisticas:
                 print("-> " + mun.upper() + ":")
                 for loc in faltantes_municipio:
                     print("- " + loc)
+
+        if hay_faltantes == False:
+            print("Todas las zonas en memoria tienen coordenadas validas.")
+                
+        print("\n")
+
+    def promedios_historicos(self, lista_dias, nombre_localidad):
+          
+        print("\nANALISIS HISTORICO DE " + nombre_localidad.upper())
+        if len(lista_dias) == 0:
+            print("Error: Lista de dias vacia.")
+            return None
+
+        matriz_datos = []
+
+        for dia in lista_dias:  
+            temp = dia.temperatura if dia.temperatura != None else 0
+            lluv = dia.lluvia if dia.lluvia != None else 0
+            hum = dia.humedad if dia.humedad != None else 0
+            vien = dia.viento if dia.viento != None else 0
+            fila = [dia.fecha, temp, lluv, hum, vien]
+            matriz_datos.append(fila)
+          
