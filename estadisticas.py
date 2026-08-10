@@ -11,7 +11,7 @@ class Estadisticas:
     def agregar_consulta(self, zona, clima): 
         self.lista_zonas.append(zona)
         self.lista_clima.append(clima)
-        
+
     def mostrar_ranking(self, lista_zonas_memoria):
         print("\nESTADISTICAS DE LA SESION ")
         
@@ -43,4 +43,28 @@ class Estadisticas:
                 
             contador = contador + 1
 
-        promedio = suma_temperaturas / len(self.lista_clima)   
+        promedio = suma_temperaturas / len(self.lista_clima)
+
+        print("RANKINGS")
+        print("-> Zona mas caliente: " + zona_caliente + " (" + str(temp_max) + " °C)")
+        print("-> Zona mas fria: " + zona_fria + " (" + str(temp_min) + " °C)")
+        print("-> Temperatura promedio consultada: " + str(round(promedio, 2)) + " °C") 
+
+        print("\nZONAS SIN COORDENADAS: ")
+        municipios = []
+        for zona in lista_zonas_memoria:
+            if zona.municipio not in municipios:
+                municipios.append(zona.municipio)
+                            
+        hay_faltantes = False
+        for mun in municipios:
+            faltantes_municipio = []
+            for zona in lista_zonas_memoria:
+                if zona.municipio == mun and (zona.latitud == None or zona.longitud == None):
+                    faltantes_municipio.append(zona.localidad)
+
+            if len(faltantes_municipio) > 0:
+                hay_faltantes = True
+                print("-> " + mun.upper() + ":")
+                for loc in faltantes_municipio:
+                    print("- " + loc)
