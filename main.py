@@ -2,7 +2,10 @@ import json
 from localidad import Localidad
 
 def cargar_json(ruta_archivo):
-    
+    """
+    Abre el archivo local de zonas, recorre el diccionario principal y transforma cada registro 
+    valido en un objeto de la clase Localidad. Retorna la lista completa de objetos.
+    """
     lista_zonas = []
     
     try:
@@ -13,13 +16,13 @@ def cargar_json(ruta_archivo):
         for municipio, lista_de_localidades in datos_json.items():
             for item in lista_de_localidades:
                 nueva_zona = Localidad(
-                    municipio,
-                    item["localidad"],
+                    municipio,          
+                    item["localidad"],  
                     item["latitud"],
                     item["longitud"]
                 )
                 lista_zonas.append(nueva_zona)
-
+            
         return lista_zonas
         
     except FileNotFoundError:
@@ -30,8 +33,11 @@ def cargar_json(ruta_archivo):
         return []
 
 def reporte_inicial(lista_zonas):
-
-    print("\nREPORTE INICIAL DE ZONAS DE CARACAS\n")
+    """
+    Genera y muestra en consola un resumen matematico al iniciar el programa. Calcula por cada 
+    municipio el total de zonas, cuantas tienen coordenadas validas, cuantas son nulas y su porcentaje.
+    """
+    print("\nREPORTE INICIAL DE CARACAS: ")
     
     if len(lista_zonas) == 0:
         print("La lista de zonas esta vacia.")
@@ -54,23 +60,25 @@ def reporte_inicial(lista_zonas):
                     con_coord = con_coord + 1
                 else:
                     sin_coord = sin_coord + 1
-
+                    
         porcentaje = 0
         if total_loc > 0:
             porcentaje = (con_coord / total_loc) * 100
-
+            
         print("\nMunicipio: " + mun.upper())
         print("-> Localidades cargadas: " + str(total_loc))
         print("-> Con coordenadas: " + str(con_coord))
         print("-> Sin coordenadas: " + str(sin_coord))
         print("-> Porcentaje de validez: " + str(round(porcentaje, 2)) + " %")
     print("\n")
-
+        
 if __name__ == "__main__":
-     
+    """
+    Bloque de ejecucion principal para ejecutar el sistema de monitoreo MeteoCaracas.
+    """
     lista_memoria = cargar_json("zonas_caracas.json")
-    reporte_inicial(lista_memoria)
-     
+    reporte_inicial(lista_memoria) 
+
     if len(lista_memoria) > 0:
         from conexion import Conexion
         from buscador import Buscador
@@ -79,13 +87,13 @@ if __name__ == "__main__":
         api = Conexion()
         motor = Buscador()
         datos_sesion = Estadisticas()
-        
+               
         salir = False
         while salir == False: 
             print("\nMENU PRINCIPAL METEOCARACAS: ")
             print("1. Busqueda jerarquica (Municipio/Localidad)")
             print("2. Busqueda directa (Nombre)")
-            print("3. Ranking de la sesion (Frio/Caliente)")
+            print("3. Modulo de Estadisticas")
             print("4. Busqueda historica por fechas (Promedios)")
             print("5. Salir")
             
@@ -110,7 +118,7 @@ if __name__ == "__main__":
                         datos_sesion.agregar_consulta(zona_resultado, clima_actual)
                     
             elif opcion == "3":
-                datos_sesion.mostrar_ranking()
+                datos_sesion.mostrar_ranking(lista_memoria)
                 
             elif opcion == "4":
                 zona_historia = motor.buscar_directo(lista_memoria)
@@ -128,14 +136,14 @@ if __name__ == "__main__":
                         fecha_fin
                     )
                     
-                    if len(datos_pasados) > 0:                       
+                    if len(datos_pasados) > 0:                      
                         tabla_mensual = datos_sesion.promedios_historicos(datos_pasados, zona_historia.localidad) 
                         
-                        abrir = input("\nDesea abrir grafico comparativo [S/n]: ")
+                        abrir = input("\nDesea abrir graficos comparativos [S/n]: ")
                         
                         if abrir == "S" or abrir == "s" or abrir == "":
-                            print("Abriendo grafico comparativo...")
-                            print("Cierre la ventana del grafico para continuar.")
+                            print("Abriendo graficos comparativos...")
+                            print("Cierre la ventana de los graficos para continuar.")
                             datos_sesion.graficar_historico(tabla_mensual, zona_historia.localidad)
                         elif abrir == "N" or abrir == "n":
                             print("Grafico omitido.")
