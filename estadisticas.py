@@ -3,16 +3,30 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 class Estadisticas:
+    """
+    Clase que funciona como motor matematico. Guarda el historial de consultas de la sesion 
+    y calcula promedios, rankings y variabilidades.
+    """
 
     def __init__(self):
-        self.lista_clima = []
-        self.lista_zonas = []
+        """
+        Constructor que inicializa dos listas vacias en memoria para llevar el registro de las zonas consultadas y sus climas.
+        """
+        self.lista_clima = [] 
+        self.lista_zonas = [] 
 
-    def agregar_consulta(self, zona, clima): 
+    def agregar_consulta(self, zona, clima):
+        """
+        Guarda el objeto de la zona y el objeto de su clima actual en las listas de la sesion activa.
+        """
         self.lista_zonas.append(zona)
         self.lista_clima.append(clima)
 
     def mostrar_ranking(self, lista_zonas_memoria):
+        """
+        Recorre el historial de la sesion para calcular e imprimir la zona mas fria, la mas 
+        caliente, el promedio general y agrupa los municipios con localidades sin coordenadas.
+        """
         print("\nESTADISTICAS DE LA SESION ")
         
         if len(self.lista_clima) == 0:
@@ -45,45 +59,49 @@ class Estadisticas:
 
         promedio = suma_temperaturas / len(self.lista_clima)
 
-        print("RANKINGS")
+        print("RANKINGS: ")    
         print("-> Zona mas caliente: " + zona_caliente + " (" + str(temp_max) + " °C)")
         print("-> Zona mas fria: " + zona_fria + " (" + str(temp_min) + " °C)")
-        print("-> Temperatura promedio consultada: " + str(round(promedio, 2)) + " °C") 
+        print("-> Temperatura promedio consultada: " + str(round(promedio, 2)) + " °C")
 
         print("\nZONAS SIN COORDENADAS: ")
         municipios = []
         for zona in lista_zonas_memoria:
             if zona.municipio not in municipios:
                 municipios.append(zona.municipio)
-                            
+                
         hay_faltantes = False
         for mun in municipios:
             faltantes_municipio = []
             for zona in lista_zonas_memoria:
                 if zona.municipio == mun and (zona.latitud == None or zona.longitud == None):
                     faltantes_municipio.append(zona.localidad)
-
+            
+            # Solo imprimimos el municipio si tiene zonas faltantes
             if len(faltantes_municipio) > 0:
                 hay_faltantes = True
                 print("-> " + mun.upper() + ":")
                 for loc in faltantes_municipio:
                     print("- " + loc)
-
+                    
         if hay_faltantes == False:
             print("Todas las zonas en memoria tienen coordenadas validas.")
-                
+        
         print("\n")
-
+  
     def promedios_historicos(self, lista_dias, nombre_localidad):
-          
+        """
+        Utiliza la libreria Pandas para calcular los records absolutos (calor, frio, lluvia, humedad) 
+        de un periodo pasado y genera una tabla con los promedios desglosados por mes. Retorna dicha tabla.
+        """
         print("\nANALISIS HISTORICO DE " + nombre_localidad.upper())
         if len(lista_dias) == 0:
             print("Error: Lista de dias vacia.")
             return None
 
         matriz_datos = []
-
-        for dia in lista_dias:  
+            
+        for dia in lista_dias: # Extraemos las 4 variables protegiendo contra nulos          
             temp = dia.temperatura if dia.temperatura != None else 0
             lluv = dia.lluvia if dia.lluvia != None else 0
             hum = dia.humedad if dia.humedad != None else 0
