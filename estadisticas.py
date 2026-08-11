@@ -77,7 +77,6 @@ class Estadisticas:
                 if zona.municipio == mun and (zona.latitud == None or zona.longitud == None):
                     faltantes_municipio.append(zona.localidad)
             
-            # Solo imprimimos el municipio si tiene zonas faltantes
             if len(faltantes_municipio) > 0:
                 hay_faltantes = True
                 print("-> " + mun.upper() + ":")
@@ -101,7 +100,7 @@ class Estadisticas:
 
         matriz_datos = []
             
-        for dia in lista_dias: # Extraemos las 4 variables protegiendo contra nulos          
+        for dia in lista_dias:          
             temp = dia.temperatura if dia.temperatura != None else 0
             lluv = dia.lluvia if dia.lluvia != None else 0
             hum = dia.humedad if dia.humedad != None else 0
