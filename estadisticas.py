@@ -94,13 +94,11 @@ class Estadisticas:
         columnas = ["Fecha", "Temperatura", "Lluvia", "Humedad", "Viento"]
         tabla = pd.DataFrame(matriz_datos, columns=columnas)
         
-        # Calculos basicos de Records
         indice_calor = tabla["Temperatura"].idxmax()
         indice_frio = tabla["Temperatura"].idxmin()
         indice_lluvia = tabla["Lluvia"].idxmax()       
         indice_humedad = tabla["Humedad"].idxmax()
         
-        # Extraemos el año (AAAA-MM-DD)
         año_calor = tabla["Fecha"][indice_calor][0:4]
         año_frio = tabla["Fecha"][indice_frio][0:4]
         año_lluvia = tabla["Fecha"][indice_lluvia][0:4]
@@ -112,7 +110,6 @@ class Estadisticas:
         print("-> Año con mayor lluvia: " + año_lluvia + " (" + str(tabla["Lluvia"][indice_lluvia]) + " mm)")
         print("-> Año con mayor humedad: " + año_humedad + " (" + str(tabla["Humedad"][indice_humedad]) + " %)")
         
-        # Promedios desglosados por mes
         tabla["Mes"] = tabla["Fecha"].str.slice(0, 7)
         promedios_mes = tabla.groupby("Mes")[["Temperatura", "Lluvia", "Humedad", "Viento"]].mean()
         
@@ -121,9 +118,8 @@ class Estadisticas:
         print(promedios_mes.round(2))
         pd.reset_option('display.max_rows')
         
-        # Calculo matricial
         matriz_clima = np.array(tabla[["Temperatura", "Lluvia", "Humedad", "Viento"]])
-        promedios_generales = np.mean(matriz_clima, axis=0) # Promedio de todas las filas por columna
+        promedios_generales = np.mean(matriz_clima, axis=0) 
         
         print("\nPROMEDIOS GENERALES DEL PERIODO")
         print("-> Temperatura promedio: " + str(round(promedios_generales[0], 2)) + " °C")
@@ -147,7 +143,6 @@ class Estadisticas:
         humedades = list(tabla_meses["Humedad"])
         vientos = list(tabla_meses["Viento"])
 
-        # Si hay muchos meses, mostramos pocos de referencia
         cantidad_meses = len(meses)
         salto = cantidad_meses // 36
         if salto == 0:
@@ -159,35 +154,28 @@ class Estadisticas:
             posiciones.append(i)
             etiquetas.append(meses[i])
 
-        # Configuracion de las ventanas
-        # Ventana 1: Temperatura y Lluvia 
         titulo_ventana_1 = "Temperatura y Lluvia de " + nombre_localidad
         plt.figure(num=titulo_ventana_1, figsize=(10, 8))
 
-        # Temperatura
         plt.subplot(2, 1, 1)
         plt.plot(meses, temperaturas, color="red", marker="o")
         plt.title("Temperatura (°C)")
         plt.xticks(posiciones, etiquetas, rotation=45, fontsize=8)
 
-        # Lluvia
         plt.subplot(2, 1, 2)
         plt.bar(meses, lluvias, color="blue")
         plt.title("Lluvia (mm)")
         plt.xticks(posiciones, etiquetas, rotation=45, fontsize=8)       
         plt.tight_layout() 
 
-        # Ventana 2: Humedad y Viento
         titulo_ventana_2 = "Humedad y Viento de " + nombre_localidad
         plt.figure(num=titulo_ventana_2, figsize=(10, 8))
 
-        # Humedad
         plt.subplot(2, 1, 1)
         plt.plot(meses, humedades, color="green", marker="s")
         plt.title("Humedad Relativa (%)")
         plt.xticks(posiciones, etiquetas, rotation=45, fontsize=8)
 
-        # Viento
         plt.subplot(2, 1, 2)
         plt.plot(meses, vientos, color="orange", marker="^")
         plt.title("Velocidad del Viento (km/h)")
